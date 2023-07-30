@@ -2,15 +2,10 @@
 import requests
 from bs4 import BeautifulSoup
 from datetime import date
+import pandas as pd
 
 # Function to scrape Google search results for a given query
 def scrape_google_search_results(query):
-    # Generating a file name for storing the results in CSV format
-    file_name = "google_results_" + query + "_" + str(date.today()) +".csv"
-    
-    # Opening the file in write mode
-    f = open(file_name, "w")
-    
     # The base URL for Google search
     base_url = "https://www.google.com/search?q="
     
@@ -35,15 +30,20 @@ def scrape_google_search_results(query):
         
         # Finding all the links from the search results using their class name
         links = soup.find_all("div", class_="yuRUbf")
-        print(links)
-        # Extracting and storing the URLs of the search results in the CSV file and the results list
+        
+        # Extracting and storing the URLs of the search results
         for link in links:
             url = link.find("a").get("href")
-            f.write(url + "\n")  # Writing the URL to the CSV file
-            results.append(url)  # Adding the URL to the results list
+            results.append(url)
 
-    # Closing the CSV file
-    f.close()
+    # Generating a file name for storing the results in XLSX format
+    file_name = "google_results_" + query + "_" + str(date.today()) + ".xlsx"
+    
+    # Convert the list of links to a DataFrame
+    df = pd.DataFrame(results, columns=['Link'])
+    
+    # Write the DataFrame to an Excel file
+    df.to_excel(file_name, index=False, sheet_name='Tabelle1')
 
 # Usage
 # Taking input from the user for the Google search query
